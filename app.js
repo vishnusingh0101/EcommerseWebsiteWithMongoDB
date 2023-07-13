@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const errorController = require('./controllers/error');
 const mongoose = require('mongoose');
 
-// const User = require('./models/user');
+const User = require('./models/user');
 
 const app = express();
 
@@ -19,14 +19,14 @@ const shopRoutes = require('./routes/shop');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use((req, res, next) => {
-//   User.findById("64ad06ad315036286fc530c9")
-//     .then(user => {
-//       req.user = new User(user.name, user.email, user.cart, user._id);
-//       next();
-//     })
-//     .catch(err => console.log(err));
-// });
+app.use((req, res, next) => {
+  User.findById("64b0229d60882978cd40c20e")
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
@@ -35,6 +35,18 @@ app.use(errorController.get404);
 
 mongoose.connect('mongodb+srv://vishnu:vishnu836921@cluster0.axx85zr.mongodb.net/test?retryWrites=true')
   .then(result => {
+    User.findOne().then(user => {
+      if (!user) {
+        const user = new User({
+          name: 'Vishnu Singh',
+          email: 'vishnusinghchauhan1233@gmail.com',
+          cart: {
+            items: []
+          },
+        })
+        user.save();
+      }
+    });
     app.listen(3000);
   })
   .catch(err => console.log(err));
